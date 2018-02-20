@@ -61,15 +61,12 @@ blur_filter = np.array(
      [0.00002292 , 0.00078633 , 0.00655965 , 0.01330373 , 0.00655965 , 0.00078633 , 0.00002292],
      [0.00000067 , 0.00002292 , 0.00019117 , 0.00038771 , 0.00019117 , 0.00002292 , 0.00000067]])
 
-edge_filter = np.array(
-        [[-1, -1, -1],
-         [-1,  8, -1],
-         [-1, -1, -1]]
-        )
+edge_filter = np.array([[-1, -1, -1], [-1,  8, -1], [-1, -1, -1]])
+
 blured = convolve(grey, blur_filter)
 edges = convolve(grey, edge_filter)
 
 save_image(grey, "lenna.png")
 save_image(blured, "lenna-blured.png")
-save_image(edges, "lenna-blured.png")
+save_image(edges, "lenna-edges.png")
 
