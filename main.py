@@ -1,6 +1,6 @@
 from PIL import Image
+import scipy.stats as st
 import numpy as np
-
 
 def load_image(file_name):
     """Load an image into a numpy array."""
@@ -43,6 +43,26 @@ def convolve(data, convf):
 
     return out
 
+def gkern(kernlen=31, nsig=10, thresh=0.001):
+    """Returns a 2D Gaussian kernel array."""
+
+    interval = (2*nsig+1.)/(kernlen)
+    x = np.linspace(-nsig-interval/2., nsig+interval/2., kernlen+1)
+    kern1d = np.diff(st.norm.cdf(x))
+    kernel_raw = np.sqrt(np.outer(kern1d, kern1d))
+    kernel = kernel_raw/kernel_raw.sum()
+
+    #kernel = kernel / np.max( kernel.ravel() )
+
+    shape = kernel.shape
+    kernel = kernel.ravel()
+
+    inds = np.where( kernel < thresh )[0]
+    kernel[ inds ] = 0.0
+
+    kernel = kernel.reshape( shape )
+
+    return kernel
 
 img = load_image("res/lenna.png")
 
@@ -61,9 +81,11 @@ blur_filter = np.array(
      [0.00002292 , 0.00078633 , 0.00655965 , 0.01330373 , 0.00655965 , 0.00078633 , 0.00002292],
      [0.00000067 , 0.00002292 , 0.00019117 , 0.00038771 , 0.00019117 , 0.00002292 , 0.00000067]])
 
+gblur_filter = gkern()
+
 edge_filter = np.array([[-1, -1, -1], [-1,  8, -1], [-1, -1, -1]])
 
-blured = convolve(grey, blur_filter)
+blured = convolve(grey, gblur_filter)
 edges = convolve(grey, edge_filter)
 
 save_image(grey, "lenna.png")
